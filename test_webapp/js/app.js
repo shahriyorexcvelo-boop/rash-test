@@ -336,6 +336,39 @@ async function launchApp() {
       openOnboardingModal();
     }, 600);
   }
+
+  // Real vaqt rejimida Bot & Server faolligini tekshirish
+  checkBotServerStatus();
+  setInterval(checkBotServerStatus, 10000);
+}
+
+// ── SERVER & BOT STATUS MONITOR ─────────────────
+async function checkBotServerStatus() {
+  var pill = document.getElementById('bot-status-pill');
+  var txt = document.getElementById('bot-status-text');
+  if (!pill || !txt) return;
+
+  try {
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 4000);
+    var res = await fetch(API_BASE + '/api/app/status', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      var data = await res.json();
+      if (data.bot_active || data.status === 'online') {
+        pill.className = 'server-status-pill online';
+        txt.textContent = 'Faol';
+        pill.setAttribute('title', '🟢 Bot va Server 24/7 faol ishlamoqda');
+        return;
+      }
+    }
+    throw new Error('Offline');
+  } catch (e) {
+    pill.className = 'server-status-pill offline';
+    txt.textContent = 'O\'chiq';
+    pill.setAttribute('title', '🔴 Server yoki Macbook o\'chiq holatda');
+  }
 }
 
 // ── API ─────────────────────────────────────────

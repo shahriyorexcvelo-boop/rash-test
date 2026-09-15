@@ -91,6 +91,14 @@ def profile_webapp_kb(user_tg_id: int) -> InlineKeyboardMarkup:
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+def results_webapp_kb() -> InlineKeyboardMarkup:
+    """Natijalarni ko'rish mini ilovasi tugmasi."""
+    app_url = f"{WEBAPP_URL}/app.html"
+    buttons = [
+        [make_webapp_button("📊 Asosiy ilovani ochish", app_url, fallback_cb="open_app_info")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 def contact_share_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="📱 Telefon raqamni yuborish", request_contact=True)]],
@@ -434,23 +442,11 @@ async def admin_webapp_info_cb(call: CallbackQuery):
 # 2. 📊 Mening natijalarim
 @router.message(F.text == "📊 Mening natijalarim")
 async def show_my_results(message: Message):
-    submissions = test_db.get_user_submissions(message.from_user.id)
-    if not submissions:
-        await message.answer("ℹ️ Siz hali birorta ham test topshirmagansiz.")
-        return
-
-    text = "📊 <b>Sizning test natijalaringiz tarixi:</b>\n\n"
-    for idx, s in enumerate(submissions[:10], 1):
-        dt = time.strftime("%d.%m.%Y %H:%M", time.localtime(s["submitted_at"]))
-        grade = test_db.calculate_grade(s.get("score", 0))
-        text += (
-            f"<b>{idx}. {s.get('test_title', 'Test')}</b>\n"
-            f"🎖 <b>Daraja:</b> <b>{grade}</b> ({s['score']} ball)\n"
-            f"✅ <b>To'g'ri:</b> {s['correct_count']} ta\n"
-            f"🕒 <b>Sana:</b> {dt}\n\n"
-        )
-
-    await message.answer(text)
+    await message.answer(
+        "📊 <b>Barcha test natijalaringiz, to'liq tahlil va to'g'ri kalitlarni asosiy ilovadan ko'rishingiz mumkin.</b>\n\n"
+        "Ilovani ochish uchun quyidagi tugmani bosing 👇",
+        reply_markup=results_webapp_kb()
+    )
 
 # 3. 👤 Profil
 @router.message(F.text == "👤 Profilim")
@@ -1481,6 +1477,17 @@ async def handle_app_set_pin(request):
     except Exception as e:
         return web.json_response({"success": False, "message": str(e)}, status=400)
 
+async def handle_app_status(request):
+    """Bot va server holatini (online/active) tekshirish."""
+    import time
+    return web.json_response({
+        "success": True,
+        "status": "online",
+        "bot_active": True,
+        "server_time": int(time.time()),
+        "uptime": int(time.time())
+    }, headers={"Access-Control-Allow-Origin": "*"})
+
 async def handle_app_verify_pin(request):
     """Foydalanuvchi PIN kodini bazadan tekshirish."""
     try:
@@ -1594,6 +1601,7 @@ async def create_web_app():
     app.router.add_get('/api/app/active-tests', handle_app_active_tests)
     app.router.add_get('/api/app/my-results', handle_app_my_results)
     app.router.add_get('/api/app/users', handle_app_users)
+    app.router.add_get('/api/app/status', handle_app_status)
     app.router.add_post('/api/app/compare-keys', handle_app_compare_keys)
     app.router.add_post('/api/app/set-pin', handle_app_set_pin)
     app.router.add_post('/api/app/verify-pin', handle_app_verify_pin)
@@ -1605,14 +1613,47 @@ async def create_web_app():
 
     return app
 
+async def keep_alive_pinger(url: str):
+    """Render.com yoki bulutli server uxlamasligi uchun har 8 daqiqada avtomatik so'rov yuborish (24/7 Keep-Alive)."""
+    import aiohttp
+    log.info(f"🔄 24/7 Keep-Alive xizmati faollashtirildi: {url}")
+    await asyncio.sleep(60) # Ilk urinish 1 daqiqadan so'ng
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{url}/api/app/status", timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                    if resp.status == 200:
+                        log.info("💓 Keep-Alive ping muvaffaqiyatli (Server faol).")
+        except Exception as e:
+            log.warning(f"Keep-Alive ping xatosi: {e}")
+        await asyncio.sleep(480) # Har 8 daqiqada (480s) qaytariladi
+
 # ── AVTOMATIK HTTPS TUNNEL (OGOHLANTIRISHLARSIZ / TO'G'RIDAN-TO'G'RI OCHILUVCHI) ──
 async def maintain_tunnel(local_port: int):
     """Telegram Mini App uchun tunnel yoki Railway doimiy HTTPS manzilini sozlaydi."""
     global WEBAPP_URL
     import re
 
-    # Agar Railway yoki boshqa doimiy domenda ishlayotgan bo'lsa
-    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    # Agar Render.com yoki Railway yoki boshqa doimiy domenda ishlayotgan bo'lsa
+    render_domain = os.getenv("RENDER_EXTERNAL_URL")
+    is_render = os.getenv("RENDER") == "true" or bool(os.getenv("RENDER_SERVICE_ID")) or bool(os.getenv("RENDER_INSTANCE_ID"))
+    if render_domain or is_render:
+        if not render_domain:
+            render_domain = os.getenv("WEBAPP_URL") or "https://rash-test.onrender.com"
+        WEBAPP_URL = (render_domain if render_domain.startswith("http") else f"https://{render_domain}").rstrip("/")
+        log.info(f"🚀 Render.com Production muhiti aniqlandi: {WEBAPP_URL}")
+        try:
+            with open("tunnel_url.txt", "w") as f:
+                f.write(WEBAPP_URL)
+            menu_btn = MenuButtonWebApp(text="Mini App", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app.html"))
+            await bot.set_chat_menu_button(menu_button=menu_btn)
+            log.info("✅ Bot menyu tugmasi Render.com doimiy URL ga ulandi!")
+        except Exception as e:
+            log.error(f"Menu tugmasini yangilashda xatolik: {e}")
+        # 24/7 Keep-Alive taskini ishga tushirish (Render uxlamasligi uchun)
+        asyncio.create_task(keep_alive_pinger(WEBAPP_URL))
+        return
+
     if railway_domain:
         WEBAPP_URL = f"https://{railway_domain}"
         log.info(f"🚂 Railway Production muhiti aniqlandi: {WEBAPP_URL}")
