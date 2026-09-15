@@ -317,10 +317,35 @@ body {
   color: #64748b;
 }
 
+.splash-badge {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-top: 10px;
+  z-index: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: fadeInUp 0.6s ease 0.55s both;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .splash-badge {
+  background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(99,102,241,0.08));
+  border: 1px solid rgba(37,99,235,0.25);
+  color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.1);
+}
+
 .splash-dots {
   display: flex;
   gap: 6px;
-  margin-top: 32px;
+  margin-top: 24px;
   z-index: 1;
   animation: fadeInUp 0.6s ease 0.6s both;
 }
