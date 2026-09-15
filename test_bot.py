@@ -25,7 +25,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import (
     CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup,
     KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove,
-    WebAppInfo, FSInputFile, MenuButtonWebApp
+    WebAppInfo, FSInputFile, MenuButtonWebApp, BotCommand
 )
 from aiohttp import web
 import test_db
@@ -441,6 +441,7 @@ async def admin_webapp_info_cb(call: CallbackQuery):
 
 # 2. 📊 Mening natijalarim
 @router.message(F.text == "📊 Mening natijalarim")
+@router.message(Command("results"))
 async def show_my_results(message: Message):
     await message.answer(
         "📊 <b>Barcha test natijalaringiz, to'liq tahlil va to'g'ri kalitlarni asosiy ilovadan ko'rishingiz mumkin.</b>\n\n"
@@ -450,6 +451,7 @@ async def show_my_results(message: Message):
 
 # 3. 👤 Profil
 @router.message(F.text == "👤 Profilim")
+@router.message(Command("profile"))
 async def show_profile(message: Message):
     user = test_db.get_user(message.from_user.id)
     if not user:
@@ -471,6 +473,7 @@ async def show_profile(message: Message):
 
 # 4. ℹ️ Bot haqida
 @router.message(F.text == "ℹ️ Bot haqida")
+@router.message(Command("help"))
 async def show_about(message: Message):
     await message.answer(
         "🤖 <b>Test Tekshirish Tizimi Boti</b>\n\n"
@@ -480,6 +483,15 @@ async def show_about(message: Message):
         "• Maxsus matematik klaviaturadan foydalanib yopiq savollarni kiritishingiz;\n"
         "• Natijalarni bir zumda tekshirib, xatolaringiz ustida ishlashingiz mumkin!\n\n"
         "📞 <b>Murojaat uchun:</b> @eshmbetov"
+    )
+
+# 5. 📱 Mini App buyrug'i
+@router.message(Command("app"))
+async def open_app_command(message: Message):
+    await message.answer(
+        "📱 <b>RASH TEST Mini App tizimiga kirish:</b>\n\n"
+        "Quyidagi tugmani bosing 👇",
+        reply_markup=results_webapp_kb()
     )
 
 # ── ADMIN PANEL HANDLERLARI ───────────────────────────
@@ -1753,6 +1765,19 @@ async def main():
     log.info("🤖 Telegram Bot Polling rejimida ishga tushmoqda...")
     try:
         await bot.delete_webhook(drop_pending_updates=True)
+        # Telegram rasmiy menyu buyruqlarini ro'yxatdan o'tkazish
+        try:
+            await bot.set_my_commands([
+                BotCommand(command="start", description="🚀 Botni ishga tushirish"),
+                BotCommand(command="app", description="📱 Test topshirish (Mini App)"),
+                BotCommand(command="results", description="📊 Mening natijalarim"),
+                BotCommand(command="profile", description="👤 Shaxsiy profilim"),
+                BotCommand(command="help", description="ℹ️ Qo'llanma va yordam"),
+            ])
+            log.info("✅ Telegram Bot rasmiy buyruqlar menyusi o'rnatildi (/start, /app, ...)")
+        except Exception as ce:
+            log.warning(f"Bot buyruqlarini o'rnatishda ogohlantirish: {ce}")
+
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
