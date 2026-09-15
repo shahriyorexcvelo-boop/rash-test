@@ -329,13 +329,6 @@ async function launchApp() {
   try { await loadUserProfile(); } catch(e) { console.warn('Profile:', e); }
   updateHeaderUser();
   switchTab('home');
-
-  // Yangi foydalanuvchilar uchun avtomatik qo'llanma oynasini ochish
-  if (!localStorage.getItem('onboarding_seen')) {
-    setTimeout(function() {
-      openOnboardingModal();
-    }, 600);
-  }
 }
 
 // ── API ─────────────────────────────────────────
@@ -531,12 +524,7 @@ function renderProfileTab() {
     '<div class="info-row"><div class="info-icon">\uD83D\uDCF1</div><div><div class="info-label">' + t('info_phone') + '</div><div class="info-value">' + escHtml(phone) + '</div></div></div>' +
     '<div class="info-row"><div class="info-icon">\uD83D\uDD17</div><div><div class="info-label">' + t('info_tg') + '</div><div class="info-value">' + escHtml(username) + '</div></div></div>' +
     '<div class="info-row"><div class="info-icon">\uD83C\uDD94</div><div><div class="info-label">' + t('info_id') + '</div><div class="info-value">' + tgId + '</div></div></div>' +
-    '</div>' +
-    '<button class="admin-action-btn animate-in" onclick="openOnboardingModal()" style="margin-top:12px;background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(99,102,241,0.12));border:1px solid rgba(59,130,246,0.25);">' +
-    '<div class="btn-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff">📖</div>' +
-    '<div><span style="font-weight:700;color:var(--text);display:block">Bot qanday ishlaydi?</span><span style="font-size:11px;color:var(--text-muted)">Yangi o\'quvchilar uchun to\'liq qo\'llanma</span></div>' +
-    '<span class="btn-arrow" style="color:#3b82f6">›</span>' +
-    '</button>';
+    '</div>';
 }
 
 // ── ADMIN TAB ───────────────────────────────────
@@ -855,77 +843,4 @@ function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(function() { toast.classList.remove('show'); }, 2200);
-}
-
-// ── ONBOARDING / BOT QO'LLANMA OYNASI ───────────
-var currentOnboardingSlide = 0;
-var totalOnboardingSlides = 4;
-
-function openOnboardingModal() {
-  currentOnboardingSlide = 0;
-  goOnboardingSlide(0);
-  var modal = document.getElementById('onboarding-modal');
-  if (modal) {
-    modal.style.display = 'flex';
-    setTimeout(function() {
-      modal.classList.add('open');
-    }, 20);
-  }
-}
-
-function closeOnboardingModal() {
-  var modal = document.getElementById('onboarding-modal');
-  if (modal) {
-    modal.classList.remove('open');
-    setTimeout(function() {
-      modal.style.display = 'none';
-    }, 280);
-  }
-}
-
-function goOnboardingSlide(idx) {
-  currentOnboardingSlide = idx;
-  for (var i = 0; i < totalOnboardingSlides; i++) {
-    var slide = document.getElementById('onboarding-slide-' + i);
-    var dot = document.getElementById('ob-dot-' + i);
-    if (slide) {
-      if (i === idx) {
-        slide.style.display = 'block';
-        slide.classList.add('active');
-      } else {
-        slide.style.display = 'none';
-        slide.classList.remove('active');
-      }
-    }
-    if (dot) {
-      if (i === idx) {
-        dot.classList.add('active');
-      } else {
-        dot.classList.remove('active');
-      }
-    }
-  }
-
-  var btnNext = document.getElementById('onboarding-next-btn');
-  if (btnNext) {
-    if (idx === totalOnboardingSlides - 1) {
-      btnNext.innerHTML = 'Boshlash 🚀';
-    } else {
-      btnNext.innerHTML = 'Keyingisi ›';
-    }
-  }
-}
-
-function nextOnboardingSlide() {
-  if (currentOnboardingSlide < totalOnboardingSlides - 1) {
-    goOnboardingSlide(currentOnboardingSlide + 1);
-  } else {
-    finishOnboarding();
-  }
-}
-
-function finishOnboarding() {
-  localStorage.setItem('onboarding_seen', 'true');
-  closeOnboardingModal();
-  showToast('Tizimdan muvaffaqiyatli foydalanishingiz mumkin! 🎉');
 }

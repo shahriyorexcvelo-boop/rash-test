@@ -33,7 +33,7 @@ import test_db
 # ── SOZLAMALAR ────────────────────────────────────────
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8892124781:AAGTRWY78lfHn3pQoBoIG30zH9OoDQF5N2g")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "8039427064"))
-PORT = int(os.getenv("PORT", "8081"))
+PORT = int(os.getenv("PORT", "8080"))
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://bcc029b8f2861a.lhr.life")
 
 logging.basicConfig(
@@ -1388,17 +1388,36 @@ async def handle_create_test_api(request):
         log.error(f"Create Test API Error: {e}", exc_info=True)
         return web.json_response({"success": False, "message": str(e)}, status=400)
 
+async def find_web_file(filename: str) -> str:
+    base_dir = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(base_dir, 'test_webapp', filename),
+        os.path.join(base_dir, 'test_webapp', 'css', filename),
+        os.path.join(base_dir, 'test_webapp', 'js', filename),
+        os.path.join(base_dir, 'test_webapp', 'img', filename),
+        os.path.join(base_dir, filename),
+        os.path.join(base_dir, os.path.basename(filename))
+    ]
+    for c in candidates:
+        if os.path.exists(c) and os.path.isfile(c):
+            return c
+    return os.path.join(base_dir, filename)
+
 async def handle_index(request):
-    webapp_dir = os.path.join(os.path.dirname(__file__), 'test_webapp')
-    return web.FileResponse(os.path.join(webapp_dir, 'index.html'))
+    return web.FileResponse(await find_web_file('index.html'))
 
 async def handle_admin(request):
-    webapp_dir = os.path.join(os.path.dirname(__file__), 'test_webapp')
-    return web.FileResponse(os.path.join(webapp_dir, 'admin.html'))
+    return web.FileResponse(await find_web_file('admin.html'))
 
 async def handle_app(request):
-    webapp_dir = os.path.join(os.path.dirname(__file__), 'test_webapp')
-    return web.FileResponse(os.path.join(webapp_dir, 'app.html'))
+    return web.FileResponse(await find_web_file('app.html'))
+
+async def handle_static_file(request):
+    path_name = request.match_info.get('path', '')
+    fpath = await find_web_file(path_name)
+    if os.path.exists(fpath) and os.path.isfile(fpath):
+        return web.FileResponse(fpath)
+    return web.Response(status=404, text="Fayl topilmadi")
 
 # ── ASOSIY MINI APP API ENDPOINTLARI ────────────────────────────────────────
 
@@ -1437,6 +1456,7 @@ async def handle_app_profile(request):
         user_data['tests_count'] = len(submissions)
         user_data['avg_score'] = round(avg_score, 1)
         user_data['max_score'] = max_score_val
+        user_data['has_pin'] = bool(user and user.get('pin_code'))
 
         return web.json_response({
             "success": True,
@@ -1446,6 +1466,32 @@ async def handle_app_profile(request):
         })
     except Exception as e:
         log.error(f"App Profile API Error: {e}", exc_info=True)
+        return web.json_response({"success": False, "message": str(e)}, status=400)
+
+async def handle_app_set_pin(request):
+    """Foydalanuvchi PIN kodini bazada saqlash."""
+    try:
+        data = await request.json()
+        tg_id = int(data.get('tg_id', 0))
+        pin = str(data.get('pin', '')).strip()
+        if not tg_id or len(pin) != 4:
+            return web.json_response({"success": False, "message": "4 xonali PIN kerak"}, status=400)
+        test_db.set_user_pin(tg_id, pin)
+        return web.json_response({"success": True})
+    except Exception as e:
+        return web.json_response({"success": False, "message": str(e)}, status=400)
+
+async def handle_app_verify_pin(request):
+    """Foydalanuvchi PIN kodini bazadan tekshirish."""
+    try:
+        data = await request.json()
+        tg_id = int(data.get('tg_id', 0))
+        pin = str(data.get('pin', '')).strip()
+        stored = test_db.get_user_pin(tg_id)
+        if stored and stored == pin:
+            return web.json_response({"success": True, "valid": True})
+        return web.json_response({"success": True, "valid": False})
+    except Exception as e:
         return web.json_response({"success": False, "message": str(e)}, status=400)
 
 async def handle_app_compare_keys(request):
@@ -1459,22 +1505,20 @@ async def handle_app_compare_keys(request):
         if not tg_id or not test_id:
             return web.json_response({"success": False, "message": "Noto'g'ri so'rov"}, status=400)
 
-        t = test_db.get_test_by_id(test_id)
-        if not t:
+        test = test_db.get_test_by_id(test_id)
+        if not test:
             return web.json_response({"success": False, "message": "Test topilmadi"}, status=404)
 
-        expected_code = (t.get('key_access_code') or '').strip()
-        
-        if expected_code and code != expected_code:
+        expected_code = str(test.get('key_access_code', '')).strip()
+        if expected_code and expected_code != code:
             return web.json_response({"success": False, "message": "Parol noto'g'ri!"}, status=403)
 
-        submission = test_db.get_user_submission_for_test(test_id, tg_id)
-        if not submission:
-            return web.json_response({"success": False, "message": "Ushbu test uchun javoblaringiz topilmadi!"}, status=404)
+        sub = test_db.get_user_submission_for_test(test_id, tg_id)
+        if not sub:
+            return web.json_response({"success": False, "message": "Siz ushbu testni topshirmagansiz"}, status=400)
 
-        import json
-        correct_answers = json.loads(t['answers_json']) if t.get('answers_json') else {}
-        user_answers = json.loads(submission['answers_json']) if submission.get('answers_json') else {}
+        correct_answers = test_db.parse_answers_json(test.get('answers_json', '{}'))
+        user_answers = test_db.parse_answers_json(sub.get('answers_json', '{}'))
 
         return web.json_response({
             "success": True,
@@ -1551,19 +1595,13 @@ async def create_web_app():
     app.router.add_get('/api/app/my-results', handle_app_my_results)
     app.router.add_get('/api/app/users', handle_app_users)
     app.router.add_post('/api/app/compare-keys', handle_app_compare_keys)
-
-    # 5. Fallback web app fayllari (css, js)
-    webapp_dir = os.path.join(os.path.dirname(__file__), 'test_webapp')
-    if os.path.exists(webapp_dir):
-        css_dir = os.path.join(webapp_dir, 'css')
-        js_dir = os.path.join(webapp_dir, 'js')
-        img_dir = os.path.join(webapp_dir, 'img')
-        if os.path.exists(css_dir):
-            app.router.add_static('/css', css_dir)
-        if os.path.exists(js_dir):
-            app.router.add_static('/js', js_dir)
-        if os.path.exists(img_dir):
-            app.router.add_static('/img', img_dir)
+    app.router.add_post('/api/app/set-pin', handle_app_set_pin)
+    app.router.add_post('/api/app/verify-pin', handle_app_verify_pin)
+    # Universal Static Route
+    app.router.add_get('/css/{path:.*}', handle_static_file)
+    app.router.add_get('/js/{path:.*}', handle_static_file)
+    app.router.add_get('/img/{path:.*}', handle_static_file)
+    app.router.add_get('/{path:[^/]+\\.(?:css|js|png|jpg|jpeg|svg|ico|json)}', handle_static_file)
 
     return app
 

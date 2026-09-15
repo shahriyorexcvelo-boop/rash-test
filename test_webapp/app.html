@@ -161,6 +161,56 @@
   </div>
 </div>
 
+<!-- ONBOARDING / INTRO MODAL -->
+<div id="onboarding-modal" class="modal-overlay" style="display:none;z-index:99999;">
+  <div class="modal-box onboarding-box" style="max-width:380px;text-align:center;padding:26px 20px 22px;border-radius:24px;background:var(--bg-card);box-shadow:0 20px 50px rgba(0,0,0,0.5);border:1px solid var(--border);">
+    
+    <div id="onboarding-slides-container">
+      <!-- Slide 0 -->
+      <div class="onboarding-slide" id="onboarding-slide-0">
+        <div style="width:72px;height:72px;border-radius:24px;background:rgba(59,130,246,0.15);color:#3B82F6;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 20px rgba(59,130,246,0.25);">🎓</div>
+        <h3 style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;">RASH TEST ga Xush kelibsiz!</h3>
+        <p style="font-size:13.5px;color:var(--text-muted);line-height:1.5;margin:0 auto;max-width:300px;">Ushbu bot va ilova orqali siz Milliy sertifikat va fan olimpiadalari testlarini onlayn topshirishingiz va tahlil qilishingiz mumkin.</p>
+      </div>
+
+      <!-- Slide 1 -->
+      <div class="onboarding-slide" id="onboarding-slide-1" style="display:none;">
+        <div style="width:72px;height:72px;border-radius:24px;background:rgba(16,185,129,0.15);color:#10B981;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 20px rgba(16,185,129,0.25);">✍️</div>
+        <h3 style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;">1. Testlarni topshirish</h3>
+        <p style="font-size:13.5px;color:var(--text-muted);line-height:1.5;margin:0 auto;max-width:300px;">Botga test kodini (masalan: <b>102</b>) kiritasiz va PDF fayl hamda qulay test varaqasi orqali javoblarni belgilab yuborasiz.</p>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="onboarding-slide" id="onboarding-slide-2" style="display:none;">
+        <div style="width:72px;height:72px;border-radius:24px;background:rgba(245,158,11,0.15);color:#F59E0B;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 20px rgba(245,158,11,0.25);">🎖️</div>
+        <h3 style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;">2. Ball va Darajalar</h3>
+        <p style="font-size:13.5px;color:var(--text-muted);line-height:1.5;margin:0 auto;max-width:300px;">Javoblarni yuborishingiz bilan tizim sizning toʻplagan <b>aniq ballingiz</b> va rasmiy <b>A+, A, B+, B, C</b> darajangizni hisoblab beradi.</p>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="onboarding-slide" id="onboarding-slide-3" style="display:none;">
+        <div style="width:72px;height:72px;border-radius:24px;background:rgba(139,92,246,0.15);color:#8B5CF6;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 20px rgba(139,92,246,0.25);">🔑</div>
+        <h3 style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;">3. Natijalar va Kalitlar</h3>
+        <p style="font-size:13.5px;color:var(--text-muted);line-height:1.5;margin:0 auto;max-width:300px;">Ilovaning <b>"Testlar"</b> boʻlimida barcha ishlagan testlaringiz saqlanadi. Maxfiy parol orqali toʻgʻri javoblar kalitini solishtirishingiz mumkin.</p>
+      </div>
+    </div>
+
+    <!-- Onboarding Dots -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin:22px 0 18px;">
+      <span class="onboarding-dot active" id="ob-dot-0" onclick="goOnboardingSlide(0)" style="width:24px;height:8px;border-radius:4px;background:var(--primary);cursor:pointer;transition:all 0.3s ease;"></span>
+      <span class="onboarding-dot" id="ob-dot-1" onclick="goOnboardingSlide(1)" style="width:8px;height:8px;border-radius:4px;background:var(--border);cursor:pointer;transition:all 0.3s ease;"></span>
+      <span class="onboarding-dot" id="ob-dot-2" onclick="goOnboardingSlide(2)" style="width:8px;height:8px;border-radius:4px;background:var(--border);cursor:pointer;transition:all 0.3s ease;"></span>
+      <span class="onboarding-dot" id="ob-dot-3" onclick="goOnboardingSlide(3)" style="width:8px;height:8px;border-radius:4px;background:var(--border);cursor:pointer;transition:all 0.3s ease;"></span>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="finishOnboarding()" style="flex:1;padding:12px;border-radius:12px;background:var(--bg-body);color:var(--text-muted);border:1px solid var(--border);font-weight:700;font-size:14px;cursor:pointer;">Oʻtkazish</button>
+      <button id="btn-onboarding-next" onclick="nextOnboardingSlide()" style="flex:1.4;padding:12px;border-radius:12px;background:linear-gradient(135deg, #3B82F6, #6366F1);color:white;border:none;font-weight:800;font-size:14.5px;cursor:pointer;box-shadow:0 4px 14px rgba(59,130,246,0.35);">Keyingisi ➔</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 

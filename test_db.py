@@ -3,10 +3,19 @@ Test Tekshirish Tizimi — SQLite Database moduli
 """
 import sqlite3
 import json
+import os
 import time
 from typing import Optional, List, Dict, Any
 
-DB_FILE = os.getenv("DB_PATH", "test_system.db")
+data_dir = os.getenv("DATA_DIR")
+if data_dir:
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+    except Exception:
+        pass
+    DB_FILE = os.path.join(data_dir, "test_system.db")
+else:
+    DB_FILE = os.getenv("DB_PATH", "test_system.db")
 
 def get_connection():
     conn = sqlite3.connect(DB_FILE, check_same_thread=False)
