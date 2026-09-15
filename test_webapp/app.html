@@ -9,7 +9,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="/css/app_style.css"/>
+  <link rel="stylesheet" href="/css/app_style.css?v=3.5"/>
   <script>
     (function() {
       var savedTheme = localStorage.getItem('app_theme');
@@ -47,36 +47,6 @@
     <div class="splash-dot"></div>
     <div class="splash-dot"></div>
   </div>
-</div>
-
-<!-- PIN SCREEN -->
-<div id="pin-screen" style="display:none">
-  <div class="pin-logo-wrap">
-    <img src="/img/bm_logo.jpg" alt="BM" class="pin-logo-img"/>
-  </div>
-  <div class="pin-title" id="pin-title">Xush kelibsiz!</div>
-  <div class="pin-subtitle" id="pin-subtitle">Kirish uchun PIN kodingizni kiriting</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="dot-0"></div>
-    <div class="pin-dot" id="dot-1"></div>
-    <div class="pin-dot" id="dot-2"></div>
-    <div class="pin-dot" id="dot-3"></div>
-  </div>
-  <div class="pin-keypad">
-    <button class="pin-key" onclick="onPinKey('1')">1</button>
-    <button class="pin-key" onclick="onPinKey('2')">2</button>
-    <button class="pin-key" onclick="onPinKey('3')">3</button>
-    <button class="pin-key" onclick="onPinKey('4')">4</button>
-    <button class="pin-key" onclick="onPinKey('5')">5</button>
-    <button class="pin-key" onclick="onPinKey('6')">6</button>
-    <button class="pin-key" onclick="onPinKey('7')">7</button>
-    <button class="pin-key" onclick="onPinKey('8')">8</button>
-    <button class="pin-key" onclick="onPinKey('9')">9</button>
-    <button class="pin-key empty"></button>
-    <button class="pin-key" onclick="onPinKey('0')">0</button>
-    <button class="pin-key del" onclick="onPinDel()">&#9003;</button>
-  </div>
-  <div class="pin-error-msg" id="pin-error"></div>
 </div>
 
 <!-- MAIN APP -->
@@ -234,6 +204,6 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
-<script src="/js/app.js"></script>
+<script src="/js/app.js?v=3.5"></script>
 </body>
 </html>

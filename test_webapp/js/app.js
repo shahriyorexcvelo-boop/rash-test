@@ -314,15 +314,16 @@ function showPinError(msg) {
 // ── LAUNCH APP ──────────────────────────────────
 async function launchApp() {
   var pinScreen = document.getElementById('pin-screen');
-  pinScreen.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-  pinScreen.style.opacity = '0';
-  pinScreen.style.transform = 'scale(0.96)';
-  setTimeout(function() { pinScreen.style.display = 'none'; }, 350);
+  if (pinScreen) {
+    pinScreen.style.display = 'none';
+  }
 
   var app = document.getElementById('app');
-  app.style.display = 'flex';
-  app.style.flexDirection = 'column';
-  app.classList.add('visible');
+  if (app) {
+    app.style.display = 'flex';
+    app.style.flexDirection = 'column';
+    app.classList.add('visible');
+  }
 
   applyI18n();
 

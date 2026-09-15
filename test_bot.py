@@ -1418,13 +1418,22 @@ async def handle_admin(request):
     return web.FileResponse(await find_web_file('admin.html'))
 
 async def handle_app(request):
-    return web.FileResponse(await find_web_file('app.html'))
+    resp = web.FileResponse(await find_web_file('app.html'))
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 async def handle_static_file(request):
     path_name = request.match_info.get('path', '')
     fpath = await find_web_file(path_name)
     if os.path.exists(fpath) and os.path.isfile(fpath):
-        return web.FileResponse(fpath)
+        resp = web.FileResponse(fpath)
+        if any(path_name.endswith(ext) for ext in ['.html', '.js', '.css']):
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            resp.headers['Pragma'] = 'no-cache'
+            resp.headers['Expires'] = '0'
+        return resp
     return web.Response(status=404, text="Fayl topilmadi")
 
 # ── ASOSIY MINI APP API ENDPOINTLARI ────────────────────────────────────────
