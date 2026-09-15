@@ -9,8 +9,23 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/app_style.css"/>
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('app_theme');
+      var isDark = true;
+      if (savedTheme) {
+        isDark = (savedTheme === 'dark');
+      } else if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.colorScheme) {
+        isDark = (window.Telegram.WebApp.colorScheme === 'dark');
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        isDark = false;
+      }
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      var metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0a0b14' : '#f8fafc');
+    })();
+  </script>
 </head>
 <body>
 

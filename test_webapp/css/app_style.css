@@ -97,7 +97,11 @@ body {
   align-items: center;
   justify-content: center;
   background: #08090f;
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s ease;
+}
+
+[data-theme="light"] #splash-screen {
+  background: #f8fafc;
 }
 
 .splash-bg {
@@ -107,6 +111,12 @@ body {
     radial-gradient(ellipse at 25% 25%, rgba(102,126,234,0.3) 0%, transparent 55%),
     radial-gradient(ellipse at 75% 75%, rgba(118,75,162,0.25) 0%, transparent 55%);
   animation: splashPulse 3s ease-in-out infinite alternate;
+}
+
+[data-theme="light"] .splash-bg {
+  background:
+    radial-gradient(ellipse at 25% 25%, rgba(59,130,246,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 75%, rgba(99,102,241,0.15) 0%, transparent 55%);
 }
 
 @keyframes splashPulse {
@@ -136,6 +146,11 @@ body {
   animation: splashSpin 1s linear infinite;
 }
 
+[data-theme="light"] .splash-ring {
+  border-top-color: rgba(37,99,235,0.9);
+  border-right-color: rgba(79,70,229,0.7);
+}
+
 .splash-ring-2 {
   position: absolute;
   inset: 2px;
@@ -144,6 +159,11 @@ body {
   border-bottom-color: rgba(192,132,252,0.5);
   border-left-color: rgba(102,126,234,0.3);
   animation: splashSpin 1.6s linear infinite reverse;
+}
+
+[data-theme="light"] .splash-ring-2 {
+  border-bottom-color: rgba(147,51,234,0.6);
+  border-left-color: rgba(59,130,246,0.4);
 }
 
 @keyframes splashSpin {
@@ -164,6 +184,11 @@ body {
   position: relative;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="light"] .splash-logo-box {
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(37,99,235,0.25), 0 0 50px rgba(37,99,235,0.15);
 }
 
 .splash-logo-img {
@@ -197,6 +222,10 @@ body {
   height: 200%;
   background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
   animation: splashShine 2.5s ease-in-out infinite;
+}
+
+[data-theme="light"] .splash-logo-box::before {
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.5), transparent);
 }
 
 @keyframes splashShine {
@@ -260,24 +289,32 @@ body {
 .splash-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
   letter-spacing: 3px;
   text-transform: uppercase;
   z-index: 1;
   animation: fadeInUp 0.6s ease 0.4s both;
 }
 
+[data-theme="light"] .splash-title {
+  color: #0f172a;
+}
+
 .splash-subtitle {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-top: 4px;
   z-index: 1;
   animation: fadeInUp 0.6s ease 0.5s both;
+}
+
+[data-theme="light"] .splash-subtitle {
+  color: #64748b;
 }
 
 .splash-dots {
@@ -295,6 +332,11 @@ body {
   background: rgba(102,126,234,0.6);
   animation: dotBounce 1.2s ease-in-out infinite;
 }
+
+[data-theme="light"] .splash-dot {
+  background: rgba(37,99,235,0.7);
+}
+
 .splash-dot:nth-child(2) { animation-delay: 0.15s; }
 .splash-dot:nth-child(3) { animation-delay: 0.3s; }
 
