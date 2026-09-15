@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Admin — Test va Kalitlar Yaratish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/test_style.css">
+  <style>
+    .admin-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .form-input {
+      width: 100%;
+      background: var(--bg-card-sub);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+    .q-admin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-card-sub);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+    .q-admin-num {
+      font-size: 13px;
+      font-weight: 800;
+      min-width: 32px;
+    }
+    .score-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px 6px;
+    }
+    .score-input {
+      width: 44px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-align: center;
+      outline: none;
+    }
+    .score-unit {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .open-admin-box {
+      background: var(--bg-card-sub);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .open-admin-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .open-val-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      outline: none;
+    }
+    .floating-total-badge {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      color: #FFFFFF;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================
+       ADMIN UCHUN ANIMATSIYALI INTRO EKRAN (Tez ochilish uchun yashirildi)
+       ========================================= -->
+  <div class="intro-splash-screen" id="intro-splash" style="display: none;"></div>
+
+  <div class="test-container" style="padding-bottom: 110px;">
+    
+    <!-- HEADER -->
+    <header class="test-header">
+      <div class="header-top-row">
+        <div class="header-brand-wrap">
+          <img src="img/bm_logo.png" class="header-bm-logo" alt="BM Logo">
+          <div class="header-badge" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">⚙️ ADMIN PANEL</div>
+        </div>
+        <div class="floating-total-badge" id="admin-total-badge">🎯 Jami: 100.0 ball</div>
+      </div>
+      <h1 class="test-title">Yangi Test va Kalitlar Yaratish</h1>
+      <p class="test-subtitle">Savollar kalitlarini tugmalar orqali belgilang va har bir savolga ball bering</p>
+    </header>
+
+    <main style="padding: 14px;">
+      
+      <!-- 1. ASOSIY TEST MA'LUMOTLARI -->
+      <div class="admin-card">
+        <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 10px;">📋 Test tafsilotlari</h3>
+        
+        <div class="form-group">
+          <label class="form-label">Test nomi:</label>
+          <input type="text" id="adm-test-title" class="form-input" placeholder="Masalan: Matematika Blok Test #1">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="form-group">
+            <label class="form-label">Test kodi (Unikal):</label>
+            <input type="text" id="adm-test-code" class="form-input" placeholder="MAT-01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vaqt chegarasi (daqiqa):</label>
+            <input type="number" id="adm-test-time" class="form-input" placeholder="0 - Cheksiz" value="0">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Kalitlarni ko'rish kodi (Parol):</label>
+          <input type="text" id="adm-test-key-code" class="form-input" placeholder="Masalan: 2024 (ixtiyoriy)">
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Agar kiritilsa, o'quvchilar test kalitlarini ko'rish uchun shu parolni terishlari kerak bo'ladi.</div>
+        </div>
+        <input type="hidden" id="adm-test-subject" value="Matematika">
+      </div>
+
+      <!-- JAVOBLAR HOLATI VA BELGILANMAGAN SAVOLLAR HISOBOBOTI -->
+      <div class="admin-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(239, 68, 68, 0.08)); border: 1.5px solid #F59E0B; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-weight: 800; font-size: 14px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <span id="unfilled-status-icon">⚠️</span> 
+            <span id="unfilled-status-title">Javoblar to'ldirilishi:</span>
+          </span>
+          <span id="unfilled-total-badge" style="font-size: 13px; font-weight: 900; padding: 4px 10px; border-radius: 8px; background: #EF4444; color: white;">55 ta belgilanmagan</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div id="unfilled-closed-pill" style="padding: 8px 10px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border); font-size: 12px; font-weight: 700;">
+            🔘 <b>Yopiq (1-35):</b> <br><span id="unfilled-closed-count" style="color: #EF4444; font-weight: 800;">35 ta belgilanmagan</span>
+          </div>
+          <div id="unfilled-open-pill" style="padding: 8px 10px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border); font-size: 12px; font-weight: 700;">
+            ✍️ <b>Ochiq (36-45):</b> <br><span id="unfilled-open-count" style="color: #EF4444; font-weight: 800;">20 ta kiritilmagan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. SAVOLLAR KALITLARI VA BALLARI (1-32) -->
+      <section class="section-group" style="margin-bottom: 14px;">
+        <div class="section-group-header">
+          <div class="section-badge">1-BO'LIM (1 — 32)</div>
+          <h2 class="section-heading">Variantli savollar kalitlari va ballari (1 — 32)</h2>
+          <span class="section-subtext" id="sec-subtext-1">To'g'ri javob variantini bosing — <b id="cnt-sec-1" style="color: #EF4444;">32 ta belgilanmagan</b></span>
+        </div>
+        <div id="admin-part-1">
+          <!-- JS orqali to'ldiriladi -->
+        </div>
+      </section>
+
+      <!-- 3. 33, 34, 35 SAVOLLAR (6 ta variant) -->
+      <section class="section-group" style="margin-bottom: 14px;">
+        <div class="section-group-header">
+          <div class="section-badge special-badge">2-BO'LIM (33, 34, 35)</div>
+          <h2 class="section-heading">6 ta Variantli savollar kalitlari (33 — 35)</h2>
+          <span class="section-subtext" id="sec-subtext-2">Moslik savollari (A-F) — <b id="cnt-sec-2" style="color: #EF4444;">3 ta belgilanmagan</b></span>
+        </div>
+        <div id="admin-part-2">
+          <!-- JS orqali to'ldiriladi -->
+        </div>
+      </section>
+
+      <!-- 4. 36-45 YOPIQ SAVOLLAR (a va b) -->
+      <section class="section-group">
+        <div class="section-group-header">
+          <div class="section-badge math-badge">3-BO'LIM (36 — 45)</div>
+          <h2 class="section-heading">Yopiq savollar to'g'ri javoblari va ballari</h2>
+          <span class="section-subtext" id="sec-subtext-3">Har bir savolning a va b bandlari — <b id="cnt-sec-3" style="color: #EF4444;">20 ta kiritilmagan</b></span>
+        </div>
+        <div id="admin-part-3">
+          <!-- JS orqali to'ldiriladi -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- PASTKI SAQLASH DOCKI -->
+    <footer class="bottom-submit-dock">
+      <div class="submit-dock-inner">
+        <div class="dock-summary">
+          <div class="dock-answered" id="admin-dock-total">Jami: 100.0 ball</div>
+          <div class="dock-status-sub" id="admin-dock-unfilled" style="color: #EF4444; font-weight: 800;">⚠️ 55 ta belgilanmagan</div>
+        </div>
+        <button class="btn-submit-test" style="background: linear-gradient(135deg, #2563EB, #1D4ED8);" onclick="AdminApp.saveTest()">
+          <span>💾 Testni saqlash</span>
+        </button>
+      </div>
+    </footer>
+
+  </div> <!-- /.test-container -->
+
+  <!-- =========================================
+       MATEMATIK KLAVIATURA (ADMIN UCHUN)
+       ========================================= -->
+  <div class="math-keyboard-panel" id="math-keyboard-panel">
+    
+    <!-- 1. YUQORI BOSHQARUV: Maydon Nomi + Jonli Kiritish + Tayyor Tugmasi -->
+    <div class="kb-top-bar">
+      <div class="kb-target-wrap">
+        <span class="kb-target-badge" id="keyboard-target-name">36a</span>
+        <input type="text" class="kb-live-input" id="keyboard-live-input" placeholder="Kalitni kiriting..." oninput="MathKeyboard.onLiveInput(this.value)">
+      </div>
+      <button type="button" class="kb-done-btn" onclick="MathKeyboard.close()">Tayyor ✓</button>
+    </div>
+
+    <!-- 2. BO'LIMLAR TUGMALARI (Segmented Control Tabs) -->
+    <div class="kb-tabs-bar">
+      <button type="button" class="kb-tab-btn active" id="kb-tab-math" onclick="MathKeyboard.switchTab('math')">🔢 Raqam & Belgilar</button>
+      <button type="button" class="kb-tab-btn" id="kb-tab-func" onclick="MathKeyboard.switchTab('func')">📐 Funksiya</button>
+      <button type="button" class="kb-tab-btn" id="kb-tab-vars" onclick="MathKeyboard.switchTab('vars')">🔤 Harflar</button>
+    </div>
+
+    <!-- 3. TUGMALAR TANASI -->
+    <!-- TAB 1: Asosiy Raqam va Belgilar -->
+    <div class="kb-body" id="keyboard-body-math">
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('√(')">√</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('²')">x²</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('³')">x³</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('^')">^</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('/')">/</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('π')">π</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('(')">(</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert(')')">)</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('±')">±</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('+')">+</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('-')">−</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('*')">×</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('7')">7</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('8')">8</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('9')">9</button>
+        <button type="button" class="kb-key kb-action" onclick="MathKeyboard.clear()">C</button>
+        <button type="button" class="kb-key kb-backspace" onclick="MathKeyboard.backspace()">⌫</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('4')">4</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('5')">5</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('6')">6</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('.')">.</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('-')">-</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('=')">=</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('1')">1</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('2')">2</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('3')">3</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('0')">0</button>
+        <button type="button" class="kb-key kb-nav" onclick="MathKeyboard.prevField()">◀ Oldingi</button>
+        <button type="button" class="kb-key kb-nav kb-nav-next" onclick="MathKeyboard.nextField()">Keyingi ▶</button>
+      </div>
+    </div>
+
+    <!-- TAB 2: Funksiyalar -->
+    <div class="kb-body" id="keyboard-body-func" style="display: none;">
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('sin(')">sin</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('cos(')">cos</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('tg(')">tg</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('ctg(')">ctg</button>
+        <button type="button" class="kb-key kb-backspace" onclick="MathKeyboard.backspace()">⌫</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('log(')">log</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('ln(')">ln</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('lg(')">lg</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('|')">|x|</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('∞')">∞</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('≤')">≤</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('≥')">≥</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('<')">&lt;</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('>')">&gt;</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('≠')">≠</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-action" onclick="MathKeyboard.clear()">C</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert('(')">(</button>
+        <button type="button" class="kb-key kb-func" onclick="MathKeyboard.insert(')')">)</button>
+        <button type="button" class="kb-key kb-nav" onclick="MathKeyboard.prevField()">◀ Oldingi</button>
+        <button type="button" class="kb-key kb-nav kb-nav-next" onclick="MathKeyboard.nextField()">Keyingi ▶</button>
+      </div>
+    </div>
+
+    <!-- TAB 3: Harflar -->
+    <div class="kb-body" id="keyboard-body-vars" style="display: none;">
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('x')">x</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('y')">y</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('z')">z</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('a')">a</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('b')">b</button>
+        <button type="button" class="kb-key kb-backspace" onclick="MathKeyboard.backspace()">⌫</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('c')">c</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('k')">k</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('n')">n</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('m')">m</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('t')">t</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('r')">r</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('α')">α</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('β')">β</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert('γ')">γ</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert(';')">;</button>
+        <button type="button" class="kb-key" onclick="MathKeyboard.insert(',')">,</button>
+        <button type="button" class="kb-key kb-action" onclick="MathKeyboard.clear()">C</button>
+      </div>
+      <div class="kb-row">
+        <button type="button" class="kb-key kb-space" onclick="MathKeyboard.insert(' ')" style="flex: 1.5;">probel ␣</button>
+        <button type="button" class="kb-key kb-nav" onclick="MathKeyboard.prevField()">◀ Oldingi</button>
+        <button type="button" class="kb-key kb-nav kb-nav-next" onclick="MathKeyboard.nextField()">Keyingi ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/math_keyboard.js"></script>
+  <script src="js/admin_app.js"></script>
+</body>
+</html>
